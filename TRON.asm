@@ -1,8 +1,3 @@
-; TRON Style Line Game
-; Created by Dmitri Piquero & Eric Pereira
-; CSE 3120 : Computer Architecture & Assembly
-; Programming Contest
-
 INCLUDE Irvine32.inc
 
 rows	EQU		30
@@ -347,10 +342,11 @@ drawPs PROC USES EAX EDX
 	inc AX					; border offset y
 	mov DH, AL
 	call	Gotoxy
-	mov AL, red				; player 1's color
-	mov AH, black
+	mov  eax,red+(red*16)
+	;mov AL, red				; player 1's color
+	;mov AH, red
 	call	SetTextColor
-	mov AX, '#'
+	mov AX, ' '
 	call	WriteChar		; draw at player 1 position
 
 	mov AX, p2Pos.x
@@ -360,10 +356,11 @@ drawPs PROC USES EAX EDX
 	inc AX					; border offset y
 	mov DH, AL
 	call	Gotoxy
-	mov AL, blue			; player 2's color
-	mov AH, black
+	mov  eax,blue+(blue*16)
+	;mov AL, blue			; player 2's color
+	;mov AH, blue
 	call	SetTextColor
-	mov AX, '#'
+	mov AX, ' '
 	call	WriteChar		; draw at player 2 position
 
 	ret
