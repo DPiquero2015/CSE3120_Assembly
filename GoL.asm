@@ -436,16 +436,18 @@ L2:
 			.IF count == 2 || count == 3
 				mov  EAX,green+(green*16)
 				call SetTextColor
-				mov AX, '%'
+
 				mov DH, CH
 				inc DH
 				mov DL, CL
 				inc DL 
 				call Gotoxy
+				mov AX, '%'
 				call WriteChar
 
 				; toggle cell state
-
+				mov TR, CH
+				mov TC, CL
 				call	GridAtPoint
 				mov ESI, EAX
 				mov EAX, '%'
@@ -464,9 +466,12 @@ L2:
 				call SetTextColor
 				mov AX, '&'
 				call WriteChar
+
+				mov TR, CH
+				mov TC, CL
 				call	GridAtPoint
 				mov ESI, EAX
-				mov EAX, '%'
+				mov EAX, '&'
 				;sub EAX, [ESI]
 				mov [ESI], AL
 			.ENDIF
@@ -543,11 +548,11 @@ L2:
 		mov DL, CL
 		inc DL
 		call Gotoxy
-		mov  EAX,white+(black*16)
+		mov  EAX,black+(black*16)
 		mov AX, ' '
 		call WriteChar
 				mov TR, CH
-				;inc CH
+				;inc TR
 				mov TC, CL
 				;inc TC
 				call	GridAtPoint
@@ -565,10 +570,11 @@ L2:
 		mov  EAX,green+(green*16)
 		call SetTextColor
 		mov AX, '#'
-		call writeChar
+		call WriteChar
+		mov TR, CH
+		mov TC, CL
 		call	GridAtPoint
-			mov TR, CH
-			mov TC, CL
+
 			mov ESI, EAX
 			mov EAX, '#'
 			;sub EAX, [ESI]
@@ -594,11 +600,11 @@ RemoveCells ENDP
 
 GridAtPoint PROC USES EBX ESI
 	lea ESI, grid
-	movzx EAX, TC
+	movzx EAX, TR
 	mov EBX, cols
 	mul EBX
 	add ESI, EAX
-	movzx EAX, TR
+	movzx EAX, TC
 	add ESI, EAX
 	mov EAX, ESI
 
