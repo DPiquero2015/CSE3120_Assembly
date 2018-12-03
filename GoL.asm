@@ -533,8 +533,10 @@ L2:
 		
 
 	.IF EAX == '#' 
-		mov DL, CH
-		mov DH, CL
+		mov DH, CH
+		inc DH
+		mov DL, CL
+		inc DL
 		call Gotoxy
 		mov  EAX,white+(black*16)
 		mov AX, ' '
@@ -548,15 +550,22 @@ L2:
 				mov [ESI], AL
 
 	.ELSEIF EAX == '&' || EAX == '%'
+		mov DH, CH
+		inc DH
+		mov DL, CL
+		inc DL
+		call Gotoxy
 		mov  EAX,green+(green*16)
 		call SetTextColor
 		mov AX, '#'
 		call writeChar
 		call	GridAtPoint
-				mov ESI, EAX
-				mov EAX, '#'
-				sub EAX, [ESI]
-				mov [ESI], AL
+			mov TR, CH
+			mov TC, CL
+			mov ESI, EAX
+			mov EAX, '#'
+			sub EAX, [ESI]
+			mov [ESI], AL
 
 	.ENDIF
 
@@ -565,11 +574,11 @@ L2:
 
 
 		
-	add CL, 1
-	cmp CL, rows
+	inc CL
+	cmp CL, cols
 	jne L2
-	add CH, 1
-	cmp CH, cols
+	inc CH
+	cmp CH, rows
 	jne L1
 
 
