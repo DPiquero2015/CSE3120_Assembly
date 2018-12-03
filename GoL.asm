@@ -275,12 +275,15 @@ L2:
 	mov count, 0
 	lea ESI, grid
 		movzx EAX, CH
-		mov EBX, mcols
+		mov EBX, cols
 		mul EBX
 		add ESI, EAX
 		movzx EAX, CL
 		add ESI, EAX
 		movzx EAX, byte ptr [ESI]
+		;.IF CH == 1 && CL == 0
+	;		mov EAX, EAX
+		;.ENDIF
 		mov point, EAX
 
 		mov TR, CH
@@ -431,6 +434,7 @@ L2:
 		.ENDIF
 
 
+
 		.IF point == '#' ;checks if point is hash
 
 			.IF count == 2 || count == 3
@@ -549,6 +553,7 @@ L2:
 		inc DL
 		call Gotoxy
 		mov  EAX,black+(black*16)
+		call SetTextColor
 		mov AX, ' '
 		call WriteChar
 				mov TR, CH
