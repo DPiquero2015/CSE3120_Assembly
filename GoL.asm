@@ -449,7 +449,7 @@ L2:
 				call	GridAtPoint
 				mov ESI, EAX
 				mov EAX, '%'
-				sub EAX, [ESI]
+				;sub EAX, [ESI]
 				mov [ESI], AL
 			.ENDIF
 		.ELSE ;spot is an empty space
@@ -464,6 +464,11 @@ L2:
 				call SetTextColor
 				mov AX, '&'
 				call WriteChar
+				call	GridAtPoint
+				mov ESI, EAX
+				mov EAX, '%'
+				;sub EAX, [ESI]
+				mov [ESI], AL
 			.ENDIF
 		.ENDIF
 
@@ -524,7 +529,7 @@ L1:
 L2:
 	lea ESI, grid
 		movzx EAX, CH
-		mov EBX, mcols
+		mov EBX, cols
 		mul EBX
 		add ESI, EAX
 		movzx EAX, CL
@@ -542,11 +547,13 @@ L2:
 		mov AX, ' '
 		call WriteChar
 				mov TR, CH
+				;inc CH
 				mov TC, CL
+				;inc TC
 				call	GridAtPoint
 				mov ESI, EAX
 				mov EAX, 0
-				sub EAX, [ESI]
+				;sub EAX, [ESI]
 				mov [ESI], AL
 
 	.ELSEIF EAX == '&' || EAX == '%'
@@ -564,13 +571,13 @@ L2:
 			mov TC, CL
 			mov ESI, EAX
 			mov EAX, '#'
-			sub EAX, [ESI]
+			;sub EAX, [ESI]
 			mov [ESI], AL
 
 	.ENDIF
 
-	mov  EAX,white+(black*16)
-	call SetTextColor
+	;mov  EAX,white+(black*16)
+	;call SetTextColor
 
 
 		
