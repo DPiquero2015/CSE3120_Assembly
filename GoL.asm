@@ -31,7 +31,7 @@ tMove2	BYTE	"Arrow Keys",0
 tTgle1	BYTE	"Toggle Cells",0
 tTgle2	BYTE	"Spacebar",0
 tSped1	BYTE	"Change Speed",0
-tSped2	BYTE	"1, 2, 3, 4",0
+tSped2	BYTE	"1, 2, 3, 4, 5",0
 tPase1	BYTE	"Pause Game",0
 tPase2	BYTE	"Enter / Return",0
 tRsrt1	BYTE	"Restart Game",0
@@ -197,9 +197,11 @@ Input PROC uses EAX EDX
 		mov speed, 8
 	.ELSEIF DX == '4'
 		mov speed, 2
+	.ELSEIF DX == '5'
+		mov speed, 1
 	.ENDIF
 
-	.IF AL >= '1' && AL <= '4'
+	.IF AL >= '1' && AL <= '5'
 		mov DL, cols
 		add DL, 10
 		mov DH, mrows
@@ -260,10 +262,6 @@ LC:
 	ret
 Update ENDP
 
-UpdateAtGrid PROC
-
-UpdateAtGrid ENDP
-
 UpdateCells PROC USES EAX EBX ECX EDX ESI
 	; CELLULAR AUTOMATA RULES
 	inc iter
@@ -281,9 +279,6 @@ L2:
 		movzx EAX, CL
 		add ESI, EAX
 		movzx EAX, byte ptr [ESI]
-		;.IF CH == 1 && CL == 0
-	;		mov EAX, EAX
-		;.ENDIF
 		mov point, EAX
 
 		mov TR, CH
@@ -693,7 +688,7 @@ DrawInfoBar PROC USES EAX EDX
 	inc AL
 
 	mov DL, cols
-	add DL, 5
+	add DL, 4
 	mov DH, AL
 	call	Gotoxy
 	mov EDX, OFFSET tSped2
