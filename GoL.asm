@@ -267,23 +267,21 @@ UpdateAtGrid ENDP
 UpdateCells PROC USES EAX EBX ECX EDX ESI
 	; CELLULAR AUTOMATA RULES
 	inc iter
-	mov count, 0
+	
 	mov CH, 0
 L1:
 	mov CL, 0
 L2:
+	mov count, 0
 	lea ESI, grid
 		movzx EAX, CH
-		mov EBX, cols
+		mov EBX, mcols
 		mul EBX
 		add ESI, EAX
 		movzx EAX, CL
 		add ESI, EAX
 		movzx EAX, byte ptr [ESI]
 		mov point, EAX
-
-	;if spot is alive
-	;.IF EAX == '#'
 
 		mov TR, CH
 		mov TC, CL
@@ -299,7 +297,6 @@ L2:
 				dec TR
 				call GridCheck ;checks point right of curr point
 				
-
 			.ELSEIF CL == cols ;if row is 0 and col is furthest right, upper right corner
 				inc TR ;checks if point below is point
 				call GridCheck
@@ -327,7 +324,10 @@ L2:
 				call GridCheck ;checks if right is point
 
 			.ENDIF
+
+			
 		.ELSEIF CH == rows ;checks if row is col length
+		
 			.IF CL == 0 ; row is max length and col is 0, bottomleft corner
 				dec TR
 				call GridCheck ;checks spot above 
@@ -338,7 +338,9 @@ L2:
 				inc TR
 				call GridCheck ;checks right
 
+				
 			.ELSEIF CL == cols ;row is max length and col is maxlength, bottomright corner
+			
 				dec TR
 				call GridCheck ;checks above
 
@@ -381,7 +383,9 @@ L2:
 				dec TC
 				call GridCheck ;checkas above
 
+				
 			.ELSEIF CL == cols ;right column, not in most upper right or most upper left
+				
 
 				inc TR
 				call GridCheck ;checks position below current spot
@@ -433,8 +437,10 @@ L2:
 				mov  EAX,green+(green*16)
 				call SetTextColor
 				mov AX, '%'
-				mov DL, CH
-				mov DH, CL
+				mov DH, CH
+				inc DH
+				mov DL, CL
+				inc DL 
 				call Gotoxy
 				call WriteChar
 
@@ -448,22 +454,29 @@ L2:
 			.ENDIF
 		.ELSE ;spot is an empty space
 			.IF count == 3
+				
+				mov DL, CL
+				inc DL
+				mov DH, CH
+				inc DH
+				call Gotoxy
 				mov  EAX,green+(green*16)
 				call SetTextColor
 				mov AX, '&'
-				mov DL, CH
-				mov DH, CL
-				call Gotoxy
 				call WriteChar
 			.ENDIF
 		.ENDIF
+
+	mov  EAX,white+(black*16)
+	call SetTextColor
+
 	
 		
 	inc CL
-	cmp CL, rows
+	cmp CL, cols
 	jne L2
 	inc CH
-	cmp CH, cols
+	cmp CH, rows
 	jne L1
 
 
@@ -511,7 +524,7 @@ L1:
 L2:
 	lea ESI, grid
 		movzx EAX, CH
-		mov EBX, cols
+		mov EBX, mcols
 		mul EBX
 		add ESI, EAX
 		movzx EAX, CL
@@ -525,6 +538,9 @@ L2:
 		call Gotoxy
 		mov  EAX,white+(black*16)
 		mov AX, ' '
+		call WriteChar
+				mov TR, CH
+				mov TC, CL
 				call	GridAtPoint
 				mov ESI, EAX
 				mov EAX, 0
@@ -535,6 +551,7 @@ L2:
 		mov  EAX,green+(green*16)
 		call SetTextColor
 		mov AX, '#'
+		call writeChar
 		call	GridAtPoint
 				mov ESI, EAX
 				mov EAX, '#'
@@ -546,7 +563,7 @@ L2:
 	mov  EAX,white+(black*16)
 	call SetTextColor
 
-	call writeChar
+
 		
 	add CL, 1
 	cmp CL, rows
@@ -561,11 +578,11 @@ RemoveCells ENDP
 
 GridAtPoint PROC USES EBX ESI
 	lea ESI, grid
-	movzx EAX, DH
+	movzx EAX, TC
 	mov EBX, cols
 	mul EBX
 	add ESI, EAX
-	movzx EAX, DL
+	movzx EAX, TR
 	add ESI, EAX
 	mov EAX, ESI
 
