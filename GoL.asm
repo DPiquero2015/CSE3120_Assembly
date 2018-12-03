@@ -41,6 +41,7 @@ tPause	BYTE	"Paused",0
 tPsSpc	BYTE	"      ",0
 tSpeed	BYTE	"Speed: 1",0
 tIters	BYTE	"Cycle: 0        ",0
+point	BYTE	?
 
 borV	BYTE	cols + 2 DUP("*"),0
 borH	BYTE	"*"
@@ -216,7 +217,7 @@ Update PROC
 	; toggle cell state
 	call	GridAtCursor
 	mov ESI, EAX
-	mov EAX, 1
+	mov EAX, '#'
 	sub EAX, [ESI]
 	mov [ESI], AL
 
@@ -256,20 +257,181 @@ LC:
 	ret
 Update ENDP
 
-UpdateCells PROC USES EDX
+UpdateAtGrid PROC
+
+UpdateAtGrid ENDP
+
+UpdateCells PROC USES EAX EBX ECX EDX ESI
 	; CELLULAR AUTOMATA RULES
 	inc iter
+	mov CH, 0
+L1:
+	mov CL, 0
+L2:
+	lea ESI, grid
+		movzx EAX, CH
+		mov EBX, cols
+		mul EBX
+		add ESI, EAX
+		movzx EAX, CL
+		add ESI, EAX
+		movzx EAX, byte ptr [ESI]
+
+	;if spot is alive
+	;.IF EAX == '#'
+
+		xor ebx, ebx ;sets EBX to 0
+		.IF CH == 0; checks if row is 0
+			.IF CL == 0 ;if col and row are 0, topleft corner
+				mov DH, CH
+				inc DH
+				mov DL, CL
+				
+
+			.ELSEIF CL == cols ;if row is 0 and col is furthest right, upper right corner
+
+
+			.ELSE ;top row
+
+
+			.ENDIF
+		.ELSEIF CH == rows ;checks if row is col length
+			.IF CL == 0 ;c row is max length and col is 0, bottomleft corner
+			.ELSEIF CL == cols ;row is max length and col is maxlength, bottomright corner
+			.ELSE; bottom row
+			.ENDIF
+		.ELSE
+			.IF CL == 0 ;left column, not in upper right or bottom right
+			.ELSEIF CL == cols ;right column, not in most upper right or most upper left
+			.ELSE ;all central blocks not near an edge
+			.ENDIF
+		.ENDIF
+
+
+		.IF point == '#' ;checks if EAX is hash
+
+			.IF EBX == 2 || EBX == 3
+				mov  EAX,green+(green*16)
+				call SetTextColor
+				mov AX, '%'
+				call WriteChar
+
+				; toggle cell state
+				call	GridAtPoint
+				mov ESI, EAX
+				mov EAX, '%'
+				sub EAX, [ESI]
+				mov [ESI], AL
+			.ELSE
+				mov  EAX,green+(green*16)
+				call SetTextColor
+				mov AX, '%'
+				call WriteChar
+			.ENDIF
+		.ELSE ;spot is an empty space
+			.IF EBX == 3
+				mov  EAX,green+(green*16)
+				call SetTextColor
+				mov AX, '&'
+				call WriteChar
+			.ENDIF
+		.ENDIF
+	
+		
+	add CL, 1
+	cmp CL, rows
+	jne L2
+	add CH, 1
+	cmp CH, cols
+	jne L1
+
+
+
+
 
 	mov DL, cols
 	add DL, 10
 	mov DH, rows
 	sub DH, 2
 	call	Gotoxy
+	;call RemoveCells
+	mov  EAX,white+(black*16)
+	call SetTextColor
 	movzx EAX, iter
 	call	WriteDec
-
+		
 	ret
 UpdateCells ENDP
+
+
+
+
+
+;removecells is done
+RemoveCells proc uses EAX 
+	mov CH, 0
+L1:
+	mov CL, 0
+L2:
+	lea ESI, grid
+		movzx EAX, CH
+		mov EBX, cols
+		mul EBX
+		add ESI, EAX
+		movzx EAX, CL
+		add ESI, EAX
+		movzx EAX, BYTE PTR [ESI]
+		;somehow get grid character and store in eax
+	.IF EAX == '#'
+		mov DL, CH
+		mov DH, CL
+		call Gotoxy
+		mov  EAX,white+(black*16)
+		mov AX, ' '
+				call	GridAtPoint
+				mov ESI, EAX
+				mov EAX, 0
+				sub EAX, [ESI]
+				mov [ESI], AL
+	.ELSEIF EAX == '&' || EAX == '%'
+		mov  EAX,green+(green*16)
+		call SetTextColor
+		mov AX, '#'
+		call	GridAtPoint
+				mov ESI, EAX
+				mov EAX, '#'
+				sub EAX, [ESI]
+				mov [ESI], AL
+	.ENDIF
+	mov  EAX,white+(black*16)
+	call SetTextColor
+
+	call writeChar
+		
+	add CL, 1
+	cmp CL, rows
+	jne L2
+	add CH, 1
+	cmp CH, cols
+	jne L1
+
+
+	ret
+RemoveCells ENDP
+
+GridAtPoint PROC USES EBX ESI
+	lea ESI, grid
+	movzx EAX, DH
+	mov EBX, cols
+	mul EBX
+	add ESI, EAX
+	movzx EAX, DL
+	add ESI, EAX
+	mov EAX, ESI
+
+	ret
+GridAtPoint ENDP
+
 
 DrawInfoBar PROC USES EAX EDX
 	mov AL, 1
@@ -438,11 +600,17 @@ DrawCursorBG PROC USES EAX
 	call	GoToCursor
 
 	.IF EAX > 0
+		mov  EAX,green+(green*16)
+		call SetTextColor
 		mov AX, '#'
 	.ELSE
+		mov  EAX,white+(black*16)
+		call SetTextColor
 		mov AX, ' '
 	.ENDIF
 	call	WriteChar
+	mov EAX, white+(black*16)
+	call setTextColor
 
 	ret
 DrawCursorBG ENDP
@@ -459,6 +627,7 @@ GridAtCursor PROC USES EBX ESI
 
 	ret
 GridAtCursor ENDP
+
 
 GoToCursor PROC USES EAX EDX
 	mov AX, cursor.x
