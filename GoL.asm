@@ -20,7 +20,7 @@ ucount	BYTE	?
 iflag	BYTE	?
 paused	BYTE	?
 speed	BYTE	?
-iter	BYTE	?
+iter	WORD	?
 count	BYTE	?
 
 tTtle1	BYTE	"Conway's",0
